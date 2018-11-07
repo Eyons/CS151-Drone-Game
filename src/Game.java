@@ -184,7 +184,17 @@ public class Game extends JPanel implements KeyListener {
         }
         g.drawString("Score: " + score, 400, 325);
         g.drawString("Remaining Lives: " + remainingLives, 375, 340);
-        g.drawString("Remaining Time: " + (gameTime/60) + ":" + (gameTime-(gameTime/60)*60), 360, 355);
+        
+        //Adds remaining time. If seconds is less than 10, a 0 is padded on the seconds value
+        if((gameTime-(gameTime/60)*60) < 10)
+        {
+        	 g.drawString("Remaining Time: " + (gameTime/60) + ":0" + (gameTime-(gameTime/60)*60), 360, 355);
+        }
+        else
+        {
+        	 g.drawString("Remaining Time: " + (gameTime/60) + ":" + (gameTime-(gameTime/60)*60), 360, 355);
+        }
+       
         if (gameOver) {
             g.setFont(new Font("Matura MT Script Capitals Regular", Font.PLAIN, 150));
             g.drawString("GAME", 200, 150);

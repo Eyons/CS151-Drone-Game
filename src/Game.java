@@ -12,6 +12,7 @@ public class Game extends JPanel implements KeyListener {
     private ArrayList<Airplane> arrayList = new ArrayList<>();
     private Image img;
     private int score;
+    private int totalGames;
     private int remainingLives;
     private boolean gameOver;
     private boolean up;
@@ -56,6 +57,9 @@ public class Game extends JPanel implements KeyListener {
         removeKeyListener(this);
         gameOver = true;
         score++;
+        totalGames++;
+        
+        restartGame();
     }
 
     public void keyPressed(KeyEvent e) {
@@ -125,6 +129,27 @@ public class Game extends JPanel implements KeyListener {
         this.img = Toolkit.getDefaultToolkit().createImage("background.png");
 
         score = 0;
+        totalGames = 0;
+        remainingLives = 3;
+
+        gameOver = false;
+        up = false;
+        down = false;
+        left = false;
+        right = false;
+    }
+    
+    public void restartGame() {
+        gameTime = 90;
+        setFocusable(true);
+        addKeyListener(this);
+
+        timerSpawn.start();
+        timer.start();
+        gameTimer.start();
+
+        score = 0;
+        totalGames++;
         remainingLives = 3;
 
         gameOver = false;
@@ -162,6 +187,7 @@ public class Game extends JPanel implements KeyListener {
                     remainingLives--;
                     gameOver = true;
                     removeKeyListener(this);
+                    restartGame();
                 } else {
                     airplane.collided = true;
                     remainingLives -= 1;
@@ -182,15 +208,19 @@ public class Game extends JPanel implements KeyListener {
         for (Airplane airplane : arrayList) {
             airplane.draw(g);
         }
+        
         String timeFormat = String.format("%1d:%02d", (gameTime/60), (gameTime-(gameTime/60)*60));
-        g.drawString("Score: " + score, 400, 325);
+        g.drawString("Score: " + score + " out of " + totalGames, 380, 325);
         g.drawString("Remaining Lives: " + remainingLives, 375, 340);
+        
         g.drawString("Remaining Time: " + timeFormat, 360, 355);
+        
+        
         if (gameOver) {
-            g.setFont(new Font("Matura MT Script Capitals Regular", Font.PLAIN, 150));
-            g.drawString("GAME", 200, 150);
-            g.drawString("OVER", 210, 275);
+        	g.drawImage(img, 0, -50, null);
+        	drone.draw(g);
         }
+        
         repaint();
     }
 }

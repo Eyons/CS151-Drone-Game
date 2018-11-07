@@ -182,9 +182,10 @@ public class Game extends JPanel implements KeyListener {
         for (Airplane airplane : arrayList) {
             airplane.draw(g);
         }
+        String timeFormat = String.format("%1d:%02d", (gameTime/60), (gameTime-(gameTime/60)*60));
         g.drawString("Score: " + score, 400, 325);
         g.drawString("Remaining Lives: " + remainingLives, 375, 340);
-        g.drawString("Remaining Time: " + (gameTime/60) + ":" + (gameTime-(gameTime/60)*60), 360, 355);
+        g.drawString("Remaining Time: " + timeFormat, 360, 355);
         if (gameOver) {
             g.setFont(new Font("Matura MT Script Capitals Regular", Font.PLAIN, 150));
             g.drawString("GAME", 200, 150);

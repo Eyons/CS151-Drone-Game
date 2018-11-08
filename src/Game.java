@@ -15,6 +15,7 @@ public class Game extends JPanel implements KeyListener {
     private int totalGames;
     private int remainingLives;
     private boolean gameOver;
+    private boolean frozen;
     private boolean up;
     private boolean down;
     private boolean left;
@@ -65,6 +66,7 @@ public class Game extends JPanel implements KeyListener {
         remainingLives = 3;
 
         gameOver = false;
+        frozen = false;
         up = false;
         down = false;
         left = false;
@@ -75,11 +77,15 @@ public class Game extends JPanel implements KeyListener {
         timer.stop();
         timerSpawn.stop();
         gameTimer.stop();
+
         drone.setX(150);
         drone.setY(180);
-        removeKeyListener(this);
+        frozen = true;
         gameOver = true;
+
         arrayList.clear();
+        
+        totalGames++;
         if(remainingLives > 1)
             score++;
     }
@@ -91,43 +97,43 @@ public class Game extends JPanel implements KeyListener {
         timer.restart();
         gameTimer.restart();
 
-        totalGames++;
         remainingLives = 3;
 
         gameOver = false;
+        frozen = false;
     }
 
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
-        if (key == KeyEvent.VK_UP) {
+        if ((key == KeyEvent.VK_UP) && !frozen) {
             drone.up();
             up = true;
         }
-        if (key == KeyEvent.VK_DOWN) {
+        if ((key == KeyEvent.VK_DOWN) && !frozen) {
             drone.down();
             down = true;
         }
-        if (key == KeyEvent.VK_LEFT) {
+        if ((key == KeyEvent.VK_LEFT) && !frozen) {
             drone.left();
             left = true;
         }
-        if (key == KeyEvent.VK_RIGHT) {
+        if ((key == KeyEvent.VK_RIGHT) && !frozen) {
             drone.right();
             right = true;
         }
-        if(up && left){
+        if((up && left) && !frozen){
             drone.up();
             drone.left();
         }
-        if(up && right){
+        if((up && right) && !frozen){
             drone.up();
             drone.right();
         }
-        if(down && left){
+        if((down && left) && !frozen){
             drone.down();
             drone.left();
         }
-        if(down && right){
+        if((down && right) && !frozen){
             drone.down();
             drone.right();
         }
@@ -150,8 +156,8 @@ public class Game extends JPanel implements KeyListener {
         if(key == KeyEvent.VK_SPACE && gameOver){
             restartGame();
         }
-        if(key == KeyEvent.VK_ENTER)
-            gameOver = true;
+//        if(key == KeyEvent.VK_ENTER)
+//            gameOver = true;
     }
 
     public void keyTyped(KeyEvent e) {
@@ -184,14 +190,17 @@ public class Game extends JPanel implements KeyListener {
                     timerSpawn.stop();
                     remainingLives--;
                     gameOver = true;
-                    removeKeyListener(this);
+                    frozen = true;
                     endGame();
                     break;
                 } else {
                     airplane.collided = true;
                     remainingLives -= 1;
-                    removeKeyListener(this);
-                    Timer temp = new Timer(5000, e -> addKeyListener(this));
+                    frozen = true;
+                    Timer temp = new Timer(5000, e -> {
+                        if(!gameOver)
+                            frozen = false;
+                    });
                     temp.setRepeats(false);
                     temp.start();
                 }

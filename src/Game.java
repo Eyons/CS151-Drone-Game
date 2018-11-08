@@ -39,7 +39,6 @@ public class Game extends JPanel implements KeyListener {
         for (int i = 0; i < arrayList.size(); i++) {
             int temp = arrayList.get(i).left();
             if (temp == 1) {
-//                score++;
                 tempCheck.add(i);
             }
         }
@@ -50,16 +49,52 @@ public class Game extends JPanel implements KeyListener {
         detectCollisions();
     });
 
-    public void endGame(){
+    public Game() {
+        gameTime = 90;
+        setFocusable(true);
+        addKeyListener(this);
+
+        timerSpawn.start();
+        timer.start();
+        gameTimer.start();
+
+        this.img = Toolkit.getDefaultToolkit().createImage("background.png");
+
+        score = 0;
+        totalGames = 0;
+        remainingLives = 3;
+
+        gameOver = false;
+        up = false;
+        down = false;
+        left = false;
+        right = false;
+    }
+
+    private void endGame(){
         timer.stop();
         timerSpawn.stop();
         gameTimer.stop();
+        drone.setX(150);
+        drone.setY(180);
         removeKeyListener(this);
         gameOver = true;
-        score++;
+        arrayList.clear();
+        if(remainingLives > 1)
+            score++;
+    }
+
+    private void restartGame() {
+        gameTime = 90;
+
+        timerSpawn.restart();
+        timer.restart();
+        gameTimer.restart();
+
         totalGames++;
-        
-        restartGame();
+        remainingLives = 3;
+
+        gameOver = false;
     }
 
     public void keyPressed(KeyEvent e) {
@@ -112,54 +147,17 @@ public class Game extends JPanel implements KeyListener {
         if (key == KeyEvent.VK_RIGHT) {
             right = false;
         }
+        if(key == KeyEvent.VK_SPACE && gameOver){
+            restartGame();
+        }
+        if(key == KeyEvent.VK_ENTER)
+            gameOver = true;
     }
 
     public void keyTyped(KeyEvent e) {
     }
 
-    public Game() {
-        gameTime = 90;
-        setFocusable(true);
-        addKeyListener(this);
-
-        timerSpawn.start();
-        timer.start();
-        gameTimer.start();
-
-        this.img = Toolkit.getDefaultToolkit().createImage("background.png");
-
-        score = 0;
-        totalGames = 0;
-        remainingLives = 3;
-
-        gameOver = false;
-        up = false;
-        down = false;
-        left = false;
-        right = false;
-    }
-    
-    public void restartGame() {
-        gameTime = 90;
-        setFocusable(true);
-        addKeyListener(this);
-
-        timerSpawn.start();
-        timer.start();
-        gameTimer.start();
-
-        score = 0;
-        totalGames++;
-        remainingLives = 3;
-
-        gameOver = false;
-        up = false;
-        down = false;
-        left = false;
-        right = false;
-    }
-
-    public void detectCollisions() {
+    private void detectCollisions() {
         Rectangle droneTop = new Rectangle(drone.getX(), drone.getY(), drone.getWidth(), drone.getHeight() / 3);
         Rectangle droneBottom = new Rectangle(drone.getX() + drone.getWidth() / 5, drone.getY() + drone.getHeight() / 3, drone.getWidth() - 2 * (drone.getWidth() / 5), drone.getHeight() - (drone.getHeight() / 3));
 
@@ -187,7 +185,8 @@ public class Game extends JPanel implements KeyListener {
                     remainingLives--;
                     gameOver = true;
                     removeKeyListener(this);
-                    restartGame();
+                    endGame();
+                    break;
                 } else {
                     airplane.collided = true;
                     remainingLives -= 1;
@@ -212,13 +211,11 @@ public class Game extends JPanel implements KeyListener {
         String timeFormat = String.format("%1d:%02d", (gameTime/60), (gameTime-(gameTime/60)*60));
         g.drawString("Score: " + score + " out of " + totalGames, 380, 325);
         g.drawString("Remaining Lives: " + remainingLives, 375, 340);
-        
         g.drawString("Remaining Time: " + timeFormat, 360, 355);
-        
-        
         if (gameOver) {
-        	g.drawImage(img, 0, -50, null);
-        	drone.draw(g);
+            g.setFont(new Font("", Font.BOLD, 50));
+            g.drawString("Press Spacebar", 250, 40);
+            g.drawString("to start a new game", 200, 85);
         }
         
         repaint();

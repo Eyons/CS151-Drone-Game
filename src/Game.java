@@ -84,7 +84,7 @@ public class Game extends JPanel implements KeyListener {
         gameOver = true;
 
         arrayList.clear();
-        
+
         totalGames++;
         if(remainingLives > 1)
             score++;
@@ -156,8 +156,6 @@ public class Game extends JPanel implements KeyListener {
         if(key == KeyEvent.VK_SPACE && gameOver){
             restartGame();
         }
-//        if(key == KeyEvent.VK_ENTER)
-//            gameOver = true;
     }
 
     public void keyTyped(KeyEvent e) {

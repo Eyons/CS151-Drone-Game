@@ -5,6 +5,13 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.ArrayList;
+import java.util.Random;
+
 public class Game extends JPanel implements KeyListener {
 
     private Random random = new Random();
@@ -21,6 +28,9 @@ public class Game extends JPanel implements KeyListener {
     private boolean left;
     private boolean right;
     private int gameTime;
+    private int planeSpeed = 10;
+    private boolean hitButAlive = false;
+    private int collisionSec = 5;
 
     private Timer gameTimer = new Timer(1000, e -> {
         if(gameTime != 0)
@@ -29,10 +39,19 @@ public class Game extends JPanel implements KeyListener {
             endGame();
         }
     });
+    
+    private Timer collisionTimer = new Timer(1000, e -> {
+        if(collisionSec > 0 && frozen)
+            collisionSec--;
+        else
+        	collisionSec = 5;
 
+    });
+    
     private Timer timerSpawn = new Timer(800, e -> {
+		
         int y = random.nextInt(360);
-        arrayList.add(new Airplane(y));
+        arrayList.add(new Airplane(y,planeSpeed));
     });
 
     private Timer timer = new Timer(100, e -> {
@@ -49,7 +68,7 @@ public class Game extends JPanel implements KeyListener {
         }
         detectCollisions();
     });
-
+    
     public Game() {
         gameTime = 90;
         setFocusable(true);
@@ -58,6 +77,7 @@ public class Game extends JPanel implements KeyListener {
         timerSpawn.start();
         timer.start();
         gameTimer.start();
+        collisionTimer.start();
 
         this.img = Toolkit.getDefaultToolkit().createImage("background.png");
 
@@ -87,8 +107,12 @@ public class Game extends JPanel implements KeyListener {
 
         totalGames++;
         if(remainingLives > 1)
-            score++;
+        {
+        	score++;
+        	planeSpeed +=10;
+        }
     }
+    
 
     private void restartGame() {
         gameTime = 90;
@@ -102,6 +126,7 @@ public class Game extends JPanel implements KeyListener {
         gameOver = false;
         frozen = false;
     }
+    
 
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -155,7 +180,8 @@ public class Game extends JPanel implements KeyListener {
         }
         if(key == KeyEvent.VK_SPACE && gameOver){
             restartGame();
-        }
+        } 
+        
     }
 
     public void keyTyped(KeyEvent e) {
@@ -190,18 +216,30 @@ public class Game extends JPanel implements KeyListener {
                     gameOver = true;
                     frozen = true;
                     endGame();
+                    planeSpeed = 10;
                     break;
                 } else {
                     airplane.collided = true;
                     remainingLives -= 1;
                     frozen = true;
+                    timer.stop();
+                    timerSpawn.stop();
+                    gameTimer.stop();
                     Timer temp = new Timer(5000, e -> {
                         if(!gameOver)
-                            frozen = false;
+                        {
+                        	frozen = false;
+                        	timer.restart();
+                            timerSpawn.restart();
+                            gameTimer.restart();
+                        }
+                            
                     });
                     temp.setRepeats(false);
                     temp.start();
                 }
+                
+       
             }
 
         }
@@ -223,6 +261,13 @@ public class Game extends JPanel implements KeyListener {
             g.setFont(new Font("", Font.BOLD, 50));
             g.drawString("Press Spacebar", 250, 40);
             g.drawString("to start a new game", 200, 85);
+        }
+        
+        if (frozen && !gameOver) {
+            g.setFont(new Font("", Font.BOLD, 50));
+            g.drawString("Collision Detected", 225, 40);
+            String collisionTimeDrawn = String.format("%01d", collisionSec);
+            g.drawString(collisionTimeDrawn, 450, 100);
         }
         
         repaint();

@@ -5,13 +5,14 @@ public class Airplane {
 
     private int x = 1010;
     private int y;
-    private int speed = 20;
+    private int speed;
     private static int width = 100;
     public boolean collided;
 
-    public Airplane(int y){
+    public Airplane(int y, int theSpeed){
         this.y = y;
         this.collided = false;
+        speed = theSpeed;
     }
 
     public int left(){

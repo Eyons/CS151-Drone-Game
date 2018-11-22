@@ -5,32 +5,34 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.util.ArrayList;
-import java.util.Random;
-
 public class Game extends JPanel implements KeyListener {
 
     private Random random = new Random();
     private Drone drone = new Drone();
-    private ArrayList<Airplane> arrayList = new ArrayList<>();
+
+    private ArrayList<Airplane> airplanes = new ArrayList<>();
+    private ArrayList<Bullet> bullets = new ArrayList<>();
+
     private Image img;
     private Image img2;
+
     private int score;
     private int totalGames;
     private int remainingLives;
+
     private boolean gameOver;
     private boolean frozen;
+
+    private boolean haveBullet;
+
     private boolean up;
     private boolean down;
     private boolean left;
     private boolean right;
+    private boolean spaceBar;
+
     private int gameTime;
     private int planeSpeed = 10;
-    private boolean hitButAlive = false;
     private int collisionSec = 5;
     private int imgPosition = 0;
     private int img2Position = 850;
@@ -73,20 +75,27 @@ public class Game extends JPanel implements KeyListener {
     private Timer timerSpawn = new Timer(800, e -> {
 		
         int y = random.nextInt(360);
-        arrayList.add(new Airplane(y,planeSpeed));
+        airplanes.add(new Airplane(y,planeSpeed));
+    });
+
+    private Timer timerShoot = new Timer(2500, e -> {
+        haveBullet = true;
     });
 
     private Timer timer = new Timer(100, e -> {
-        ArrayList<Integer> tempCheck = new ArrayList<>();
-        for (int i = 0; i < arrayList.size(); i++) {
-            int temp = arrayList.get(i).left();
-            if (temp == 1) {
-                tempCheck.add(i);
-            }
+        // If we want to clean the playing field during the game, do it here
+        // be careful for null pointer exceptions though.
+        if(spaceBar && haveBullet) {
+            haveBullet = false;
+            timerShoot.restart();
+            bullets.add(new Bullet(drone));
         }
-        if (tempCheck.size() > 0) {
-            for (int removal : tempCheck)
-                arrayList.remove(removal);
+
+        for(int i = 0; i < bullets.size(); i++){
+            bullets.get(i).right();
+        }
+        for (int i = 0; i < airplanes.size(); i++) {
+            airplanes.get(i).left();
         }
         detectCollisions();
     });
@@ -96,6 +105,7 @@ public class Game extends JPanel implements KeyListener {
         setFocusable(true);
         addKeyListener(this);
 
+        timerShoot.start();
         timerSpawn.start();
         timer.start();
         gameTimer.start();
@@ -115,19 +125,22 @@ public class Game extends JPanel implements KeyListener {
         down = false;
         left = false;
         right = false;
+        haveBullet = false;
     }
 
     private void endGame(){
         timer.stop();
         timerSpawn.stop();
         gameTimer.stop();
+        timerShoot.stop();
 
         drone.setX(150);
         drone.setY(180);
         frozen = true;
         gameOver = true;
 
-        arrayList.clear();
+        airplanes.clear();
+        bullets.clear();
 
         totalGames++;
         if(remainingLives > 1)
@@ -141,6 +154,7 @@ public class Game extends JPanel implements KeyListener {
     private void restartGame() {
         gameTime = 90;
 
+        timerShoot.restart();
         timerSpawn.restart();
         timer.restart();
         gameTimer.restart();
@@ -149,6 +163,7 @@ public class Game extends JPanel implements KeyListener {
 
         gameOver = false;
         frozen = false;
+        haveBullet = false;
     }
     
 
@@ -169,6 +184,9 @@ public class Game extends JPanel implements KeyListener {
         if ((key == KeyEvent.VK_RIGHT) && !frozen) {
             drone.right();
             right = true;
+        }
+        if ((key == KeyEvent.VK_SPACE) && !frozen){
+            spaceBar = true;
         }
         if((up && left) && !frozen){
             drone.up();
@@ -204,7 +222,10 @@ public class Game extends JPanel implements KeyListener {
         }
         if(key == KeyEvent.VK_SPACE && gameOver){
             restartGame();
-        } 
+            spaceBar = false;
+        } else if(key == KeyEvent.VK_SPACE){
+            spaceBar = false;
+        }
         
     }
 
@@ -215,7 +236,24 @@ public class Game extends JPanel implements KeyListener {
         Rectangle droneTop = new Rectangle(drone.getX(), drone.getY(), drone.getWidth(), drone.getHeight() / 3);
         Rectangle droneBottom = new Rectangle(drone.getX() + drone.getWidth() / 5, drone.getY() + drone.getHeight() / 3, drone.getWidth() - 2 * (drone.getWidth() / 5), drone.getHeight() - (drone.getHeight() / 3));
 
-        for (Airplane airplane : arrayList) {
+        for (Airplane airplane : airplanes) {
+            for(Bullet bullet : bullets){
+                if(!bullet.isCollided()) {
+                    Rectangle bulletRect = new Rectangle(bullet.getX(), bullet.getY(), bullet.getWIDTH(), bullet.getHEIGHT());
+                    // Bullet collision is off for the wings at bullet speed 20, at 10 works fine mostly
+                    if (((airplane.getTopWing().intersects(bulletRect))
+                            || (airplane.getBottomWing().intersects(bulletRect))
+                            || (airplane.getHeadShape().intersects(bulletRect))
+                            || (airplane.getBody().intersects(bulletRect)))
+                            && !airplane.collided) {
+                        airplane.collided = true;
+                        airplane.setHitByBullet(true);
+                        bullet.setCollided(true);
+                    }
+                }
+            }
+            // Checking for intersection via Polygons isn't as accurate as checking
+            // for every single line, don't edit below collision code
             if ((droneTop.intersects(airplane.getX(), airplane.getY() + 50, airplane.getWidth() - 1, airplane.getWidth() / 6)
                     || droneTop.intersectsLine(airplane.getX(), airplane.getY()+50+(airplane.getWidth()/6), (airplane.getX()-airplane.getWidth()/3), airplane.getY()+25+airplane.getWidth()/3)
                     || droneTop.intersectsLine(airplane.getX(), airplane.getY()+50, (airplane.getX()-airplane.getWidth()/3), airplane.getY()+25+airplane.getWidth()/3)
@@ -265,7 +303,6 @@ public class Game extends JPanel implements KeyListener {
                 
        
             }
-
         }
     }
 
@@ -274,8 +311,13 @@ public class Game extends JPanel implements KeyListener {
         g.drawImage(img, imgPosition, -50, null);
         g.drawImage(img2, img2Position, -50, null);
         drone.draw(g);
-        for (Airplane airplane : arrayList) {
-            airplane.draw(g);
+        for (Airplane airplane : airplanes) {
+            if(!airplane.isHitByBullet())
+                airplane.draw(g);
+        }
+        for(Bullet bullet : bullets){
+            if(!bullet.isCollided())
+                bullet.draw(g);
         }
         
         String timeFormat = String.format("%1d:%02d", (gameTime/60), (gameTime-(gameTime/60)*60));

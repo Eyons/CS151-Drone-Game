@@ -37,19 +37,19 @@ public class Drone {
     }
 
     public void up(){
-        if(y > 0) y -= 3;
+        if(y > 0) y -= 15;
     }
 
     public void down(){
-        if(y < 340) y += 3;
+        if(y < 340) y += 15;
     }
 
     public void left(){
-        if(x > 0) x -= 3;
+        if(x > 0) x -= 15;
     }
 
     public void right(){
-        if(x < 804) x += 3;
+        if(x < 804) x += 15;
     }
 
     public void draw(Graphics g){

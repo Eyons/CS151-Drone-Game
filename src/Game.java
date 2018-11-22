@@ -18,6 +18,7 @@ public class Game extends JPanel implements KeyListener {
     private Drone drone = new Drone();
     private ArrayList<Airplane> arrayList = new ArrayList<>();
     private Image img;
+    private Image img2;
     private int score;
     private int totalGames;
     private int remainingLives;
@@ -31,6 +32,8 @@ public class Game extends JPanel implements KeyListener {
     private int planeSpeed = 10;
     private boolean hitButAlive = false;
     private int collisionSec = 5;
+    private int imgPosition = 0;
+    private int img2Position = 850;
 
     private Timer gameTimer = new Timer(1000, e -> {
         if(gameTime != 0)
@@ -39,6 +42,25 @@ public class Game extends JPanel implements KeyListener {
             endGame();
         }
     });
+    
+    private Timer backgroundScroll = new Timer(100, e -> {
+    	if(imgPosition > -850 || img2Position > 0)
+    	{
+    		if(!frozen)
+    		{
+                imgPosition-= planeSpeed/5;
+                img2Position-= planeSpeed/5;
+    		}
+            
+    	}
+    	else
+    	{
+    		imgPosition = 0;
+    		img2Position = 850;
+    	}
+
+    });
+    
     
     private Timer collisionTimer = new Timer(1000, e -> {
         if(collisionSec > 0 && frozen)
@@ -78,8 +100,10 @@ public class Game extends JPanel implements KeyListener {
         timer.start();
         gameTimer.start();
         collisionTimer.start();
+        backgroundScroll.start();
 
         this.img = Toolkit.getDefaultToolkit().createImage("background.png");
+        this.img2 = Toolkit.getDefaultToolkit().createImage("background.png");
 
         score = 0;
         totalGames = 0;
@@ -247,7 +271,8 @@ public class Game extends JPanel implements KeyListener {
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(img, 0, -50, null);
+        g.drawImage(img, imgPosition, -50, null);
+        g.drawImage(img2, img2Position, -50, null);
         drone.draw(g);
         for (Airplane airplane : arrayList) {
             airplane.draw(g);

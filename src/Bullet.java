@@ -11,16 +11,20 @@ public class Bullet{
     private static int SPEED = 10;
     private static int WIDTH = 3;
     private static int HEIGHT = 3;
+    private int maxTravelDistance;
     private boolean collided;
 
     public Bullet(Drone drone){
         this.x = drone.getX() + drone.getWidth();
         this.y = drone.getY() + (drone.getHeight()/2);
+        this.maxTravelDistance = x + (850/4);
         this.collided = false;
     }
 
     public int right(){
-        x += SPEED;
+        if(x >= maxTravelDistance)
+            collided = true;
+        else x += SPEED;
         if(x+ SPEED > 850) return 1;
         else return 0;
     }

@@ -112,8 +112,8 @@ public class Game extends JPanel implements KeyListener {
         collisionTimer.start();
         backgroundScroll.start();
 
-        this.img = Toolkit.getDefaultToolkit().createImage("background.png");
-        this.img2 = Toolkit.getDefaultToolkit().createImage("background.png");
+        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
+        this.img2 = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
 
         score = 0;
         totalGames = 0;

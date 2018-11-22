@@ -9,7 +9,7 @@ public class Drone {
     private Image img;
 
     public Drone(){
-        this.img = Toolkit.getDefaultToolkit().createImage("drone.png");
+        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("drone.png"));
     }
 
     public void setX(int x) {

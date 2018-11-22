@@ -2,9 +2,11 @@
 
 Reminders: 
 
-- Use freeze boolean for managing input during the 5s freeze instead of removing and readding key tracking
+- Current bullet collision detection is scuffed, works fine for a alpha/beta version
 
 What's Left:
 
 - Nothing that I can think of from feature point of view aside from optionals
 - Bug testing
+
+There is an executable Jar located in the out/artifacts folder

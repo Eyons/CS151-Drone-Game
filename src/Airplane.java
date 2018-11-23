@@ -15,10 +15,10 @@ public class Airplane {
     private Polygon bottomWing;
     private Rectangle2D.Double body;
 
-    public Airplane(int y, int theSpeed){
+    public Airplane(int y, int speed){
         this.y = y;
         this.collided = false;
-        speed = theSpeed;
+        this.speed = speed;
         this.hitByBullet = false;
     }
 

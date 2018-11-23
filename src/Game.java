@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Game extends JPanel implements KeyListener {
 
@@ -37,6 +38,11 @@ public class Game extends JPanel implements KeyListener {
     private int imgPosition = 0;
     private int img2Position = 850;
 
+    private Timer releaseFrozen = new Timer(5000, e -> {
+        if(!gameOver)
+            frozen = false;
+    });
+
     private Timer gameTimer = new Timer(1000, e -> {
         if(gameTime != 0)
             gameTime--;
@@ -67,14 +73,14 @@ public class Game extends JPanel implements KeyListener {
     private Timer collisionTimer = new Timer(1000, e -> {
         if(collisionSec > 0 && frozen)
             collisionSec--;
-        else
-        	collisionSec = 5;
 
     });
     
-    private Timer timerSpawn = new Timer(800, e -> {
+    private Timer timerSpawn = new Timer(1000, e -> {
 		
         int y = random.nextInt(360);
+        planeSpeed = ThreadLocalRandom.current().nextInt(5, 16);
+
         airplanes.add(new Airplane(y,planeSpeed));
     });
 
@@ -83,6 +89,7 @@ public class Game extends JPanel implements KeyListener {
     });
 
     private Timer timer = new Timer(100, e -> {
+        detectCollisions();
         // If we want to clean the playing field during the game, do it here
         // be careful for null pointer exceptions though.
         if(spaceBar && haveBullet) {
@@ -101,6 +108,7 @@ public class Game extends JPanel implements KeyListener {
     });
     
     public Game() {
+        random.setSeed(System.currentTimeMillis());
         gameTime = 90;
         setFocusable(true);
         addKeyListener(this);
@@ -111,6 +119,8 @@ public class Game extends JPanel implements KeyListener {
         gameTimer.start();
         collisionTimer.start();
         backgroundScroll.start();
+
+        releaseFrozen.setRepeats(false);
 
         this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
         this.img2 = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
@@ -125,7 +135,7 @@ public class Game extends JPanel implements KeyListener {
         down = false;
         left = false;
         right = false;
-        haveBullet = false;
+        haveBullet = true;
     }
 
     private void endGame(){
@@ -144,15 +154,14 @@ public class Game extends JPanel implements KeyListener {
 
         totalGames++;
         if(remainingLives > 1)
-        {
-        	score++;
-        	planeSpeed +=10;
-        }
+            score++;
     }
     
 
     private void restartGame() {
+        random.setSeed(System.currentTimeMillis());
         gameTime = 90;
+        collisionSec = 5;
 
         timerShoot.restart();
         timerSpawn.restart();
@@ -281,24 +290,13 @@ public class Game extends JPanel implements KeyListener {
                     planeSpeed = 10;
                     break;
                 } else {
+                    releaseFrozen.restart();
                     airplane.collided = true;
                     remainingLives -= 1;
                     frozen = true;
-                    timer.stop();
-                    timerSpawn.stop();
-                    gameTimer.stop();
-                    Timer temp = new Timer(5000, e -> {
-                        if(!gameOver)
-                        {
-                        	frozen = false;
-                        	timer.restart();
-                            timerSpawn.restart();
-                            gameTimer.restart();
-                        }
-                            
-                    });
-                    temp.setRepeats(false);
-                    temp.start();
+                    collisionSec = 5;
+                    collisionTimer.restart();
+                    releaseFrozen.start();
                 }
                 
        

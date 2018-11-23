@@ -6,7 +6,8 @@ Reminders:
 
 What's Left:
 
-- Nothing that I can think of from feature point of view aside from optionals
+- Figure out what "drone has a fixed speed when the user is not using the keys to move it" means
 - Bug testing
 
+Everything including the "additional implementation" items is completed in some form.
 There is an executable Jar located in the out/artifacts folder

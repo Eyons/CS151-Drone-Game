@@ -122,8 +122,12 @@ public class Game extends JPanel implements KeyListener {
 
         releaseFrozen.setRepeats(false);
 
-        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
-        this.img2 = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
+	// Grabs the images from the "res" folder in the main directory
+//        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
+//        this.img2 = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
+	    
+        this.img = Toolkit.getDefaultToolkit().createImage("background.png");
+        this.img2 = Toolkit.getDefaultToolkit().createImage("background.png");
 
         score = 0;
         totalGames = 0;

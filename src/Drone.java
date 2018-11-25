@@ -9,7 +9,9 @@ public class Drone {
     private Image img;
 
     public Drone(){
-        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("drone.png"));
+    this.img = Toolkit.getDefaultToolkit().createImage("drone.png");
+    // Same comment as the one located in Game Constructor
+//        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("drone.png"));
     }
 
     public void setX(int x) {

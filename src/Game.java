@@ -52,6 +52,10 @@ public class Game extends JPanel implements KeyListener {
     });
     
     private Timer backgroundScroll = new Timer(100, e -> {
+        if(!up && !down && !left && !right){
+            drone.setX(drone.getX()+2);
+        }
+
     	if(imgPosition > -850 || img2Position > 0)
     	{
     		if(!frozen)
@@ -183,19 +187,15 @@ public class Game extends JPanel implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if ((key == KeyEvent.VK_UP) && !frozen) {
-            drone.up();
             up = true;
         }
         if ((key == KeyEvent.VK_DOWN) && !frozen) {
-            drone.down();
             down = true;
         }
         if ((key == KeyEvent.VK_LEFT) && !frozen) {
-            drone.left();
             left = true;
         }
         if ((key == KeyEvent.VK_RIGHT) && !frozen) {
-            drone.right();
             right = true;
         }
         if ((key == KeyEvent.VK_SPACE) && !frozen){
@@ -216,6 +216,34 @@ public class Game extends JPanel implements KeyListener {
         if((down && right) && !frozen){
             drone.down();
             drone.right();
+        }
+
+        if((!up && left) && !frozen){
+            drone.left();
+        }
+        if((up && !left) && !frozen){
+            drone.up();
+        }
+
+        if((!up && right) && !frozen){
+            drone.right();
+        }
+        if((up && !right) && !frozen){
+            drone.up();
+        }
+
+        if((!down && left) && !frozen){
+            drone.left();
+        }
+        if((down && !left) && !frozen){
+            drone.down();
+        }
+
+        if((!down && right) && !frozen){
+            drone.right();
+        }
+        if((down && !right) && !frozen){
+            drone.down();
         }
     }
 

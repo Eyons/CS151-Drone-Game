@@ -20,6 +20,7 @@ public class Game extends JPanel implements KeyListener {
     private int score;
     private int totalGames;
     private int remainingLives;
+    private int currentMaxSpeed;
 
     private boolean gameOver;
     private boolean frozen;
@@ -52,11 +53,7 @@ public class Game extends JPanel implements KeyListener {
     });
     
     private Timer backgroundScroll = new Timer(100, e -> {
-        if(!up && !down && !left && !right){
-            drone.setX(drone.getX()+2);
-        }
-
-    	if(imgPosition > -850 || img2Position > 0)
+        if(imgPosition > -850 || img2Position > 0)
     	{
     		if(!frozen)
     		{
@@ -83,7 +80,7 @@ public class Game extends JPanel implements KeyListener {
     private Timer timerSpawn = new Timer(1000, e -> {
 		
         int y = random.nextInt(360);
-        planeSpeed = ThreadLocalRandom.current().nextInt(5, 16);
+        planeSpeed = ThreadLocalRandom.current().nextInt(currentMaxSpeed-10, currentMaxSpeed+1);
 
         airplanes.add(new Airplane(y,planeSpeed));
     });
@@ -93,6 +90,10 @@ public class Game extends JPanel implements KeyListener {
     });
 
     private Timer timer = new Timer(100, e -> {
+        if(!up && !down && !left && !right){
+            if(drone.getX()<804)
+                drone.setX(drone.getX()+2);
+        }
         detectCollisions();
         // If we want to clean the playing field during the game, do it here
         // be careful for null pointer exceptions though.
@@ -114,6 +115,7 @@ public class Game extends JPanel implements KeyListener {
     public Game() {
         random.setSeed(System.currentTimeMillis());
         gameTime = 90;
+        currentMaxSpeed = 15;
         setFocusable(true);
         addKeyListener(this);
 
@@ -161,8 +163,10 @@ public class Game extends JPanel implements KeyListener {
         bullets.clear();
 
         totalGames++;
-        if(remainingLives > 1)
+        if(remainingLives > 1) {
+            currentMaxSpeed += 5;
             score++;
+        }
     }
     
 

@@ -36,6 +36,10 @@ public class Airplane {
         else return 0;
     }
 
+    public int getSpeed(){
+        return speed;
+    }
+
     public Polygon getTopWing() {
         return topWing;
     }

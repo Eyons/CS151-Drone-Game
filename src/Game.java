@@ -52,13 +52,13 @@ public class Game extends JPanel implements KeyListener {
         }
     });
     
-    private Timer backgroundScroll = new Timer(100, e -> {
+    private Timer backgroundScroll = new Timer(10, e -> {
         if(imgPosition > -850 || img2Position > 0)
     	{
     		if(!frozen)
     		{
-                imgPosition-= planeSpeed/5;
-                img2Position-= planeSpeed/5;
+                imgPosition-= 1;
+                img2Position-= 1;
     		}
             
     	}
@@ -133,7 +133,7 @@ public class Game extends JPanel implements KeyListener {
 //        this.img2 = Toolkit.getDefaultToolkit().createImage(getClass().getResource("background.png"));
 	    
         this.img = Toolkit.getDefaultToolkit().createImage("background.png");
-        this.img2 = Toolkit.getDefaultToolkit().createImage("background.png");
+        this.img2 = Toolkit.getDefaultToolkit().createImage("backgroundFlipped.png");
 
         score = 0;
         totalGames = 0;

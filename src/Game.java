@@ -55,12 +55,8 @@ public class Game extends JPanel implements KeyListener {
     private Timer backgroundScroll = new Timer(10, e -> {
         if(imgPosition > -850 || img2Position > 0)
     	{
-    		if(!frozen)
-    		{
                 imgPosition-= 1;
                 img2Position-= 1;
-    		}
-            
     	}
     	else
     	{
@@ -78,8 +74,7 @@ public class Game extends JPanel implements KeyListener {
     });
     
     private Timer timerSpawn = new Timer(1000, e -> {
-		
-        int y = random.nextInt(360);
+        int y = ThreadLocalRandom.current().nextInt(-40,360);
         planeSpeed = ThreadLocalRandom.current().nextInt(currentMaxSpeed-10, currentMaxSpeed+1);
 
         airplanes.add(new Airplane(y,planeSpeed));
@@ -89,10 +84,12 @@ public class Game extends JPanel implements KeyListener {
         haveBullet = true;
     });
 
-    private Timer timer = new Timer(100, e -> {
+    private long lastMovement = System.currentTimeMillis();
+
+    private Timer timer = new Timer(10, e -> {
         if(!up && !down && !left && !right){
             if(drone.getX()<804)
-                drone.setX(drone.getX()+2);
+                drone.setX(drone.getDX()+.2);
         }
         detectCollisions();
         // If we want to clean the playing field during the game, do it here
@@ -103,11 +100,17 @@ public class Game extends JPanel implements KeyListener {
             bullets.add(new Bullet(drone));
         }
 
-        for(int i = 0; i < bullets.size(); i++){
+        for (int i = 0; i < bullets.size(); i++) {
             bullets.get(i).right();
+            detectCollisions();
         }
-        for (int i = 0; i < airplanes.size(); i++) {
-            airplanes.get(i).left();
+
+        if(lastMovement+100 <= System.currentTimeMillis()) {
+            lastMovement=System.currentTimeMillis();
+            for (int i = 0; i < airplanes.size(); i++) {
+                airplanes.get(i).left();
+                detectCollisions();
+            }
         }
         detectCollisions();
     });

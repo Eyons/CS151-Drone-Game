@@ -2,8 +2,9 @@ import java.awt.*;
 
 public class Drone {
 
-    private int x = 150;
+    private double x = 150;
     private int y = 180;
+    private double updatedX = 0;
     private int width = 46;
     private int height = 18;
     private Image img;
@@ -14,8 +15,12 @@ public class Drone {
 //        this.img = Toolkit.getDefaultToolkit().createImage(getClass().getResource("drone.png"));
     }
 
-    public void setX(int x) {
+    public void setX(double x) {
         this.x = x;
+    }
+
+    public double getDX(){
+        return x;
     }
 
     public void setY(int y) {
@@ -23,7 +28,7 @@ public class Drone {
     }
 
     public int getX() {
-        return x;
+        return (int)x;
     }
 
     public int getY() {
@@ -56,6 +61,6 @@ public class Drone {
 
     public void draw(Graphics g){
         Graphics2D g2 = (Graphics2D) g;
-        g2.drawImage(img, x, y,null);
+        g2.drawImage(img, (int)x, y,null);
     }
 }

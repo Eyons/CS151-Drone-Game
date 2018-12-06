@@ -8,7 +8,7 @@ public class Bullet{
 
     private int x;
     private int y;
-    private static int SPEED = 10;
+    private static int SPEED = 1;
     private static int WIDTH = 3;
     private static int HEIGHT = 3;
     private int maxTravelDistance;
